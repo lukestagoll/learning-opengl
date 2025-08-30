@@ -1,10 +1,7 @@
-#include "SDL3/SDL_oldnames.h"
-#include "SDL3/SDL_scancode.h"
-#include "SDL3/SDL_stdinc.h"
-#include <cmath>
 #define SDL_MAIN_USE_CALLBACKS 1
 #define WINDOW_HEIGHT 720
 #define WINDOW_WIDTH 1280
+#include <cmath>
 
 #include <glad/glad.h>
 
@@ -81,16 +78,16 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event)
     case SDL_EVENT_KEY_DOWN:
         switch (event->key.scancode)
         {
-            case SDL_SCANCODE_ESCAPE:
-                return SDL_APP_SUCCESS;
-            case SDL_SCANCODE_TAB:
-                renderer::swapPolygonMode();
-                break;
-            case SDL_SCANCODE_SPACE:
-                renderer::swapShape();
-                break;
-            default:
-                break;
+        case SDL_SCANCODE_ESCAPE:
+            return SDL_APP_SUCCESS;
+        case SDL_SCANCODE_TAB:
+            renderer::swapPolygonMode();
+            break;
+        case SDL_SCANCODE_SPACE:
+            renderer::swapShape();
+            break;
+        default:
+            break;
         }
         break;
 
@@ -108,15 +105,13 @@ void updateColor()
     float red = 0.0f;
     float green = std::sin(time) / 2.0f + 0.5f;
     float blue = 0.0f;
-
-    renderer::updateShapeColor(red, green, blue, 1.0f);
 }
 
 SDL_AppResult SDL_AppIterate(void *appstate)
 {
     AppState *state = static_cast<AppState *>(appstate);
 
-    updateColor();
+    // updateColor();
     renderer::render();
 
     SDL_GL_SwapWindow(state->window);

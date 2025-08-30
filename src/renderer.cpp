@@ -5,13 +5,14 @@
 #include <iostream>
 
 /*
- *  vertex data for a triangle in normalised device coordinates (NDC)
- *  3 sets of x,y,z values ranging from -1 to 1.
+ *  vertex data for a triangle in normalised device coordinates (NDC) (between -1 and 1). 
+ *  3 sets of x,y,z position values and r,g,b color values.
  */
 GLfloat triangleVertices[] = {
-    -0.5f, -0.5f, 0.0f, // bottom left
-    0.5f,  -0.5f, 0.0f, // bottom right
-    0.0f,  0.5f,  0.0f  // top
+    // positions        // colors
+    -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, // bottom left
+    0.5f,  -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, // bottom right
+    0.0f,  0.5f,  0.0f, 0.0f, 0.0f, 1.0f  // top
 };
 
 /*
@@ -35,10 +36,10 @@ GLfloat triangleVertices[] = {
  *  This is done using an array of indices.
  */
 GLfloat rectangleVertices[] = {
-    0.5f,  0.5f,  0.0f, // top right
-    0.5f,  -0.5f, 0.0f, // bottom right
-    -0.5f, -0.5f, 0.0f, // bottom left
-    -0.5f, 0.5f,  0.0f  // top left
+    0.5f,  0.5f,  0.0f, 1.0f, 0.0f, 0.0f, // top right
+    0.5f,  -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, // bottom right
+    -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, // bottom left
+    -0.5f, 0.5f,  0.0f, 1.0f, 1.0f, 1.0f, // top left
 };
 
 GLuint rectangleIndices[] = {
@@ -60,10 +61,14 @@ GLuint rectangleIndices[] = {
 const GLchar *vertexShaderSource = R"glsl(
 #version 330 core
 layout (location = 0) in vec3 aPos;
+layout (location = 1) in vec3 aColor;
+
+out vec3 color;
 
 void main()
 {
     gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);
+    color = aColor;
 }
 )glsl";
 
@@ -71,12 +76,11 @@ void main()
 const GLchar *fragmentShaderSource = R"glsl(
 #version 330 core
 out vec4 FragColor;
-
-uniform vec4 shapeColor;
+in vec3 color;
 
 void main()
 {
-    FragColor = shapeColor;
+    FragColor = vec4(color, 1.0);
 } 
 )glsl";
 
@@ -229,18 +233,21 @@ void renderer::init()
      *  Our vertex buffer data is an array, so we need to tell OpenGL how to interpret the data for use in the vertex
      *  shader
      *
-     *            ┌──────────────────┬──────────────────┬──────────────────┐
-     *            │     Vertex 1     │     Vertex 2     │     Vertex 3     │
-     *            ├─────┬─────┬──────┼─────┬─────┬──────┼─────┬─────┬──────┤
-     *            │  X  │  Y  │  Z   │  X  │  Y  │  Z   │  X  │  Y  │  Z   │
-     *            └─────┴─────┴──────┴─────┴─────┴──────┴─────┴─────┴──────┘
-     *  BYTE:     0     4     8      12    16    20     24    28    32     36
-     *  POSITION: ─── STRIDE: 12 ───➤
+     *            ┌───────────────────────────────────┬───────────────────────────────────┬─────┐
+     *            │              Vertex 1             │              Vertex 2             │ ... │
+     *            ├─────┬─────┬─────┬─────┬─────┬─────┼─────┬─────┬─────┬─────┬─────┬─────┼─────┤
+     *            │  X  │  Y  │  Z  │  R  │  G  │  B  │  X  │  Y  │  Z  │  R  │  G  │  B  │ ... │
+     *            └─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┘
+     *  BYTE:     0     4     8     12    16    20    24    28    32    36    40    44    48    72
+     *  POSITION: ──────────── STRIDE: 24 ───────────➤
+     *            ─ OFFSET: 0
+     *     COLOR:                   ──────────── STRIDE: 24 ───────────➤
+     *            ── OFFSET: 12 ──➤
      *
      *  3 floats per vertex
      *
      *  Use `glVertexAttribPointer` to tell OpenGL how to interpret the vertex data.
-     *  `glVertexAttribPointer` params:
+     *  `glVertexAttribPointer` params:c
      *      1. index (GLuint) - In the vertex shader we specified the location position attr as `layout (location = 0)`,
      *         this is where we want to pass the vertex data, so we set index to 0.
      *      2. size (GLuint - either 1, 2, 3, or 4)
@@ -250,11 +257,12 @@ void renderer::init()
      *      6. pointer - offset where the position data starts in the array.
      */
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
-
-    // enable the vertex attribute by specifying the attr location as the arg
-    // (i.e. the same value as the first parameter of glVertexAttribPointer)
+    // position attribute
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)0);
     glEnableVertexAttribArray(0);
+    // color attribute
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
 
     // unbinding
     glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -281,8 +289,12 @@ void renderer::init()
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, rectangleEBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(rectangleIndices), rectangleIndices, GL_STATIC_DRAW);
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
+    // position attribute
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)0);
     glEnableVertexAttribArray(0);
+    // color attribute
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
@@ -307,12 +319,6 @@ void renderer::render()
     }
 
     glBindVertexArray(0);
-}
-
-void renderer::updateShapeColor(GLfloat r, GLfloat g, GLfloat b, GLfloat a)
-{
-    int vertexColorLocation = glGetUniformLocation(shaderProgram, "shapeColor");
-    glUniform4f(vertexColorLocation, r, g, b, a);
 }
 
 void renderer::cleanup()
