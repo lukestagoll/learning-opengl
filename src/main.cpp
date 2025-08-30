@@ -1,18 +1,26 @@
-
-#include "SDL3/SDL_scancode.h"
 #define SDL_MAIN_USE_CALLBACKS 1
 #define WINDOW_HEIGHT 720
 #define WINDOW_WIDTH 1280
 
+#include <glad/glad.h>
+
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
-#include <glad/glad.h>
+
+#include "renderer.h"
 
 typedef struct
 {
     SDL_Window *window;
     SDL_GLContext glContext;
 } AppState;
+
+typedef struct
+{
+    Uint64 last_ns;
+    Uint64 frame_ns;
+    unsigned frames;
+} FPS;
 
 SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
 {
@@ -52,6 +60,8 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
     state->glContext = glContext;
     *appstate = state;
 
+    renderer::init();
+
     return SDL_APP_CONTINUE;
 }
 
@@ -85,10 +95,20 @@ SDL_AppResult SDL_AppIterate(void *appstate)
 
     glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    renderer::render();
+
     SDL_GL_SwapWindow(state->window);
     return SDL_APP_CONTINUE;
 }
 
 void SDL_AppQuit(void *appstate, SDL_AppResult result)
 {
+    AppState *state = static_cast<AppState *>(appstate);
+    if (!state)
+    {
+        return;
+    }
+    SDL_free(state);
+    SDL_Quit();
 }

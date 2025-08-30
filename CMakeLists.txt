@@ -18,9 +18,16 @@ add_subdirectory(external/SDL EXCLUDE_FROM_ALL)
 add_library(glad external/glad/src/glad.c)
 target_include_directories(glad PUBLIC external/glad/include)
 
-add_executable(learning-opengl src/main.cpp)
+set(SOURCES
+    src/renderer.cpp
+)
 
-target_include_directories(learning-opengl PRIVATE core platform_sdl)
+add_executable(learning-opengl
+    src/main.cpp
+    ${SOURCES}
+)
+
+target_include_directories(learning-opengl PRIVATE include)
 
 target_link_libraries(learning-opengl PRIVATE glad SDL3::SDL3)
 
