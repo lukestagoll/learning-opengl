@@ -1,3 +1,4 @@
+#include "SDL3/SDL_scancode.h"
 #define SDL_MAIN_USE_CALLBACKS 1
 #define WINDOW_HEIGHT 720
 #define WINDOW_WIDTH 1280
@@ -75,9 +76,18 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event)
         return SDL_APP_SUCCESS;
 
     case SDL_EVENT_KEY_DOWN:
-        if (event->key.scancode == SDL_SCANCODE_ESCAPE)
+        switch (event->key.scancode)
         {
-            return SDL_APP_SUCCESS;
+            case SDL_SCANCODE_ESCAPE:
+                return SDL_APP_SUCCESS;
+            case SDL_SCANCODE_TAB:
+                renderer::swapPolygonMode();
+                break;
+            case SDL_SCANCODE_SPACE:
+                renderer::swapShape();
+                break;
+            default:
+                break;
         }
         break;
 
@@ -104,6 +114,8 @@ SDL_AppResult SDL_AppIterate(void *appstate)
 
 void SDL_AppQuit(void *appstate, SDL_AppResult result)
 {
+    renderer::cleanup();
+
     AppState *state = static_cast<AppState *>(appstate);
     if (!state)
     {

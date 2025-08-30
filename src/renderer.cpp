@@ -8,7 +8,43 @@
  *  vertex data for a triangle in normalised device coordinates (NDC)
  *  3 sets of x,y,z values ranging from -1 to 1.
  */
-GLfloat vertices[] = {-0.5f, -0.5f, 0.0f, 0.5f, -0.5f, 0.0f, 0.0f, 0.5f, 0.0f};
+GLfloat triangleVertices[] = {
+    -0.5f, -0.5f, 0.0f, // bottom left
+    0.5f,  -0.5f, 0.0f, // bottom right
+    0.0f,  0.5f,  0.0f  // top
+};
+
+/*
+ *  If we want to draw a rectangle we can do so by drawing two triangles using the follwoing verticies:
+ *      GLfloat vertices[] = {
+ *         // first triangle
+ *          0.5f,  0.5f, 0.0f,  // top right
+ *          0.5f, -0.5f, 0.0f,  // bottom right
+ *         -0.5f,  0.5f, 0.0f,  // top left
+ *         // second triangle
+ *          0.5f, -0.5f, 0.0f,  // bottom right
+ *         -0.5f, -0.5f, 0.0f,  // bottom left
+ *         -0.5f,  0.5f, 0.0f   // top left
+ *      };
+ *
+ *  The issue here is we have defined top left and bottom right twice.
+ *  This creates overhead that gets worse the more complex your model is.
+ *
+ *  Instead of doing this, we can store unique vertices, then tell OpenGL the order we want the
+ *  vertices to be drawn.
+ *  This is done using an array of indices.
+ */
+GLfloat rectangleVertices[] = {
+    0.5f,  0.5f,  0.0f, // top right
+    0.5f,  -0.5f, 0.0f, // bottom right
+    -0.5f, -0.5f, 0.0f, // bottom left
+    -0.5f, 0.5f,  0.0f  // top left
+};
+
+GLuint rectangleIndices[] = {
+    0, 1, 3, // first triangle
+    1, 2, 3  // second triangle
+};
 
 /*
  *  Delare the input vertex attributes with the `in` keyword.
@@ -46,7 +82,12 @@ GLint success;
 GLchar infoLog[512];
 
 GLuint vertexShader, fragmentShader, shaderProgram;
-GLuint VAO, VBO;
+GLuint triangleVAO, triangleVBO;
+GLuint rectangleVAO, rectangleVBO, rectangleEBO;
+
+bool drawTriangle = true;
+
+GLenum polygonMode = GL_FILL;
 
 void compileVertexShader()
 {
@@ -111,6 +152,17 @@ void createShaderProgram()
     }
 }
 
+void renderer::swapShape()
+{
+    drawTriangle = !drawTriangle;
+}
+
+void renderer::swapPolygonMode()
+{
+    polygonMode = polygonMode == GL_FILL ? GL_LINE : GL_FILL;
+    glPolygonMode(GL_FRONT_AND_BACK, polygonMode);
+}
+
 void renderer::init()
 {
 
@@ -130,7 +182,6 @@ void renderer::init()
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
 
-
     // ------------------------ //
     // ----- Vertex Input ----- //
     // ------------------------ //
@@ -148,15 +199,15 @@ void renderer::init()
      *
      *  These attribute configurations are stored in Vertex Array Objects (VAOs)
      *
-     *  Order of operations: bind VAO, bind & set VBO, configure vertex attributes 
+     *  Order of operations: bind VAO, bind & set VBO, configure vertex attributes
      */
-    glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
+    glGenVertexArrays(1, &triangleVAO);
+    glGenBuffers(1, &triangleVBO);
 
-    glBindVertexArray(VAO);
+    glBindVertexArray(triangleVAO);
 
     // VBO is of type GL_ARRAY_BUFFER, so we bind it to the GL_ARRAY_BUFFER.
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBindBuffer(GL_ARRAY_BUFFER, triangleVBO);
 
     /*
      *  Since we bound VBO to GL_ARRAY_BUFFER, any buffer calls we make to GL_ARRAY_BUFFER uses VBO
@@ -166,7 +217,7 @@ void renderer::init()
      *      - GL_STATIC_DRAW:  data set once & used many times
      *      - GL_DYNAMIC_DRAW: data changes a lot & used many times
      */
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(triangleVertices), triangleVertices, GL_STATIC_DRAW);
 
     // ------------------------------------- //
     // ----- Linking Vertex Attributes ----- //
@@ -202,11 +253,65 @@ void renderer::init()
     // enable the vertex attribute by specifying the attr location as the arg
     // (i.e. the same value as the first parameter of glVertexAttribPointer)
     glEnableVertexAttribArray(0);
+
+    // unbinding
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
+
+    // ---------------------------------- //
+    // ----- Element Buffer Objects ----- //
+    // ---------------------------------- //
+
+    /*
+     *  An Eement Buffer Object (EBO) stores indices that OpenGL uses to determine what vertices to draw.
+     *
+     */
+
+    glGenVertexArrays(1, &rectangleVAO);
+    glGenBuffers(1, &rectangleVBO);
+    glGenBuffers(1, &rectangleEBO);
+
+    glBindVertexArray(rectangleVAO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, rectangleVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(rectangleVertices), rectangleVertices, GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, rectangleEBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(rectangleIndices), rectangleIndices, GL_STATIC_DRAW);
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
+    glEnableVertexAttribArray(0);
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
 }
 
 void renderer::render()
 {
     glUseProgram(shaderProgram);
-    glBindVertexArray(VAO);
-    glDrawArrays(GL_TRIANGLES, 0, 3);
+
+    if (drawTriangle)
+    {
+        glBindVertexArray(triangleVAO);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
+    }
+    else
+    {
+        glBindVertexArray(rectangleVAO);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    }
+
+    glBindVertexArray(0);
+}
+
+void renderer::cleanup()
+{
+    glDeleteVertexArrays(1, &triangleVAO);
+    glDeleteBuffers(1, &triangleVBO);
+
+    glDeleteVertexArrays(1, &rectangleVAO);
+    glDeleteBuffers(1, &rectangleVBO);
+    glDeleteBuffers(1, &rectangleEBO);
+
+    glDeleteProgram(shaderProgram);
 }
