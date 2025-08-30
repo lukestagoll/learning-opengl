@@ -72,9 +72,11 @@ const GLchar *fragmentShaderSource = R"glsl(
 #version 330 core
 out vec4 FragColor;
 
+uniform vec4 shapeColor;
+
 void main()
 {
-    FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);
+    FragColor = shapeColor;
 } 
 )glsl";
 
@@ -288,6 +290,9 @@ void renderer::init()
 
 void renderer::render()
 {
+    glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
     glUseProgram(shaderProgram);
 
     if (drawTriangle)
@@ -302,6 +307,12 @@ void renderer::render()
     }
 
     glBindVertexArray(0);
+}
+
+void renderer::updateShapeColor(GLfloat r, GLfloat g, GLfloat b, GLfloat a)
+{
+    int vertexColorLocation = glGetUniformLocation(shaderProgram, "shapeColor");
+    glUniform4f(vertexColorLocation, r, g, b, a);
 }
 
 void renderer::cleanup()

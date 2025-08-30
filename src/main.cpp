@@ -1,4 +1,7 @@
+#include "SDL3/SDL_oldnames.h"
 #include "SDL3/SDL_scancode.h"
+#include "SDL3/SDL_stdinc.h"
+#include <cmath>
 #define SDL_MAIN_USE_CALLBACKS 1
 #define WINDOW_HEIGHT 720
 #define WINDOW_WIDTH 1280
@@ -99,13 +102,21 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event)
     return SDL_APP_CONTINUE;
 }
 
+void updateColor()
+{
+    float time = SDL_GetTicks() / 1000.0f;
+    float red = 0.0f;
+    float green = std::sin(time) / 2.0f + 0.5f;
+    float blue = 0.0f;
+
+    renderer::updateShapeColor(red, green, blue, 1.0f);
+}
+
 SDL_AppResult SDL_AppIterate(void *appstate)
 {
     AppState *state = static_cast<AppState *>(appstate);
 
-    glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+    updateColor();
     renderer::render();
 
     SDL_GL_SwapWindow(state->window);
