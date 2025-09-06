@@ -20,6 +20,7 @@ target_include_directories(glad PUBLIC external/glad/include)
 
 set(SOURCES
     src/renderer.cpp
+    src/shader.cpp
 )
 
 add_executable(learning-opengl
@@ -27,7 +28,7 @@ add_executable(learning-opengl
     ${SOURCES}
 )
 
-target_include_directories(learning-opengl PRIVATE include)
+target_include_directories(learning-opengl PRIVATE "${CMAKE_SOURCE_DIR}/include")
 
 target_link_libraries(learning-opengl PRIVATE glad SDL3::SDL3)
 
@@ -44,6 +45,12 @@ set_target_properties(learning-opengl PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
     OUTPUT_NAME "learning-opengl"
 )
+
+file(GLOB SHADERS "${CMAKE_SOURCE_DIR}/shaders/*.glsl")
+add_custom_command(TARGET learning-opengl POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E copy_directory
+          ${CMAKE_SOURCE_DIR}/shaders
+          $<TARGET_FILE_DIR:learning-opengl>/shaders)
 
 # ---------- Optimisations ----------
 

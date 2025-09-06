@@ -1,11 +1,10 @@
 #include "renderer.h"
-#include <cstddef>
+#include "shader.h"
 
 #include <glad/glad.h>
-#include <iostream>
 
 /*
- *  vertex data for a triangle in normalised device coordinates (NDC) (between -1 and 1). 
+ *  vertex data for a triangle in normalised device coordinates (NDC) (between -1 and 1).
  *  3 sets of x,y,z position values and r,g,b color values.
  */
 GLfloat triangleVertices[] = {
@@ -47,116 +46,16 @@ GLuint rectangleIndices[] = {
     1, 2, 3  // second triangle
 };
 
-/*
- *  Delare the input vertex attributes with the `in` keyword.
- *  We are using 3D coordinates for our vertex data, so we use `vec3`
- *  The `layout` keywords is used to set the location of the input variable
- *
- *  We then assign the position data to gl_Position.
- *  gl_Position takes in 4 params - x, y, z, w.
- *  `w` is used for perspective division - worry about that later, just use 1.0 for now.
- *
- *  This is a bare-bones shader - does no processing.
- */
-const GLchar *vertexShaderSource = R"glsl(
-#version 330 core
-layout (location = 0) in vec3 aPos;
-layout (location = 1) in vec3 aColor;
-
-out vec3 color;
-
-void main()
-{
-    gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);
-    color = aColor;
-}
-)glsl";
-
-//  Fragment shader calculates the colour output of the pixels in RGBA
-const GLchar *fragmentShaderSource = R"glsl(
-#version 330 core
-out vec4 FragColor;
-in vec3 color;
-
-void main()
-{
-    FragColor = vec4(color, 1.0);
-} 
-)glsl";
-
 GLint success;
 GLchar infoLog[512];
 
-GLuint vertexShader, fragmentShader, shaderProgram;
 GLuint triangleVAO, triangleVBO;
 GLuint rectangleVAO, rectangleVBO, rectangleEBO;
+Shader *shader = nullptr;
 
 bool drawTriangle = true;
 
 GLenum polygonMode = GL_FILL;
-
-void compileVertexShader()
-{
-    // ------------------------- //
-    // ----- Vertex Shader ----- //
-    // ------------------------- //
-
-    // create a vertex shader object
-    vertexShader = glCreateShader(GL_VERTEX_SHADER);
-
-    // attach the shader source code to the shader object. second param specifies how many strings we pass as source
-    // code
-    glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-
-    glCompileShader(vertexShader);
-
-    // check for successful compilation of the shader
-    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-    if (!success)
-    {
-        glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
-    }
-}
-
-void compileFragmentShader()
-{
-    // --------------------------- //
-    // ----- Fragment Shader ----- //
-    // --------------------------- //
-
-    // Compiling a fragment shader is pretty much the same as a vertex shader
-    fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-    glCompileShader(fragmentShader);
-
-    glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-    if (!success)
-    {
-        glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
-    }
-}
-
-void createShaderProgram()
-{
-    // -------------------------- //
-    // ----- Shader Program ----- //
-    // -------------------------- //
-
-    // Create a shader program to be able to use our shaders
-    shaderProgram = glCreateProgram();
-    glAttachShader(shaderProgram, vertexShader);
-    glAttachShader(shaderProgram, fragmentShader);
-    glLinkProgram(shaderProgram);
-
-    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-    if (!success)
-    {
-        glGetShaderInfoLog(shaderProgram, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::PROGRAM::LINK_FAILED\n" << infoLog << std::endl;
-    }
-}
 
 void renderer::swapShape()
 {
@@ -171,22 +70,7 @@ void renderer::swapPolygonMode()
 
 void renderer::init()
 {
-
-    compileVertexShader();
-    compileFragmentShader();
-    createShaderProgram();
-
-    /*
-     *  To use the shader program we call glUseProgram - subsequent shader/render call will use this program object
-     *
-     *  glUseProgram(shaderProgram);
-     *
-     *  We'll call the actual function later on
-     */
-
-    // Delete the shader after linking them to the program object
-    glDeleteShader(vertexShader);
-    glDeleteShader(fragmentShader);
+    shader = new Shader("shaders/vert.glsl", "shaders/frag.glsl");
 
     // ------------------------ //
     // ----- Vertex Input ----- //
@@ -305,7 +189,7 @@ void renderer::render()
     glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    glUseProgram(shaderProgram);
+    shader->use();
 
     if (drawTriangle)
     {
@@ -330,5 +214,5 @@ void renderer::cleanup()
     glDeleteBuffers(1, &rectangleVBO);
     glDeleteBuffers(1, &rectangleEBO);
 
-    glDeleteProgram(shaderProgram);
+    delete shader;
 }
