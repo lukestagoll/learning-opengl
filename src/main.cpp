@@ -1,6 +1,4 @@
 #define SDL_MAIN_USE_CALLBACKS 1
-#define WINDOW_HEIGHT 1280
-#define WINDOW_WIDTH 1280
 #include <cmath>
 
 #include <glad/glad.h>
@@ -8,6 +6,7 @@
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
 
+#include "constants.h"
 #include "renderer.h"
 
 typedef struct
@@ -35,7 +34,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 
-    SDL_Window *window = SDL_CreateWindow("Learning OpenGL", WINDOW_WIDTH, WINDOW_HEIGHT,
+    SDL_Window *window = SDL_CreateWindow("Learning OpenGL", SCREEN_WIDTH, SCREEN_HEIGHT,
                                           SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIGH_PIXEL_DENSITY);
 
     if (!window)

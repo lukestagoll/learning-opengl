@@ -23,12 +23,10 @@ add_library(stb_image external/stb_image/src/stb_image.c)
 target_include_directories(stb_image PUBLIC external/stb_image/include)
 
 set(SOURCES
-    src/quad.cpp
     src/renderer.cpp
     src/shader.cpp
-    src/shape.cpp
+    src/cube.cpp
     src/texture.cpp
-    src/triangle.cpp
 )
 
 add_executable(learning-opengl

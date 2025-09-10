@@ -1,10 +1,12 @@
 #include "shader.h"
+#include "constants.h"
 
 #include <cstdint>
 #include <fstream>
 #include <iostream>
 #include <sstream>
 
+#include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
 Shader::Shader(const char *vertexPath, const char *fragmentPath)
@@ -35,10 +37,28 @@ void Shader::use()
     glUseProgram(id_);
 }
 
-void Shader::setTransform(glm::mat4 transform)
+void Shader::setProjection(GLfloat degrees)
 {
-    GLuint transformLoc = glGetUniformLocation(id_, "transform");
-    glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transform));
+    glm::mat4 projection = glm::mat4(1.0f);
+    projection = glm::perspective(degrees, (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT, 0.1f, 100.0f);
+    int projectionLoc = glGetUniformLocation(id_, "projection");
+    glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
+}
+
+void Shader::setView(glm::vec3 translate)
+{
+    glm::mat4 view = glm::mat4(1.0f);
+    view = glm::translate(view, translate);
+    int viewLoc = glGetUniformLocation(id_, "view");
+    glUniformMatrix4fv(viewLoc, 1, GL_FALSE, &view[0][0]);
+}
+
+void Shader::setModel(GLfloat degrees)
+{
+    glm::mat4 model = glm::mat4(1.0f);
+    model = glm::rotate(model, degrees, glm::vec3(0.5f, 1.0f, 0.0f));
+    int modelLoc = glGetUniformLocation(id_, "model");
+    glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 }
 
 void Shader::setBool(const std::string &name, bool value) const
