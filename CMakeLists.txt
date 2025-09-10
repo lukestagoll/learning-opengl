@@ -14,6 +14,7 @@ set(SDL_EXAMPLES OFF CACHE BOOL "" FORCE)  # don’t build example programs
 set(SDL_INSTALL OFF CACHE BOOL "" FORCE)   # don’t install system-wide
 
 add_subdirectory(external/SDL EXCLUDE_FROM_ALL)
+add_subdirectory(external/glm EXCLUDE_FROM_ALL)
 
 add_library(glad external/glad/src/glad.c)
 target_include_directories(glad PUBLIC external/glad/include)
@@ -22,11 +23,12 @@ add_library(stb_image external/stb_image/src/stb_image.c)
 target_include_directories(stb_image PUBLIC external/stb_image/include)
 
 set(SOURCES
+    src/quad.cpp
     src/renderer.cpp
     src/shader.cpp
+    src/shape.cpp
     src/texture.cpp
     src/triangle.cpp
-    src/quad.cpp
 )
 
 add_executable(learning-opengl
@@ -36,7 +38,7 @@ add_executable(learning-opengl
 
 target_include_directories(learning-opengl PRIVATE "${CMAKE_SOURCE_DIR}/include")
 
-target_link_libraries(learning-opengl PRIVATE glad stb_image SDL3::SDL3)
+target_link_libraries(learning-opengl PRIVATE glad stb_image SDL3::SDL3 glm)
 
 if (WIN32)
   target_link_libraries(learning-opengl PRIVATE opengl32)

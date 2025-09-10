@@ -6,50 +6,7 @@
 #include "triangle.h"
 
 #include <glad/glad.h>
-
-/*
- *  vertex data for a triangle in normalised device coordinates (NDC) (between -1 and 1).
- *  3 sets of x,y,z position values and r,g,b color values.
- */
-GLfloat triangleVertices[] = {
-    // positions        // colors
-    -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, // bottom left
-    0.5f,  -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, // bottom right
-    0.0f,  0.5f,  0.0f, 0.0f, 0.0f, 1.0f  // top
-};
-
-/*
- *  If we want to draw a rectangle we can do so by drawing two triangles using the follwoing verticies:
- *      GLfloat vertices[] = {
- *         // first triangle
- *          0.5f,  0.5f, 0.0f,  // top right
- *          0.5f, -0.5f, 0.0f,  // bottom right
- *         -0.5f,  0.5f, 0.0f,  // top left
- *         // second triangle
- *          0.5f, -0.5f, 0.0f,  // bottom right
- *         -0.5f, -0.5f, 0.0f,  // bottom left
- *         -0.5f,  0.5f, 0.0f   // top left
- *      };
- *
- *  The issue here is we have defined top left and bottom right twice.
- *  This creates overhead that gets worse the more complex your model is.
- *
- *  Instead of doing this, we can store unique vertices, then tell OpenGL the order we want the
- *  vertices to be drawn.
- *  This is done using an array of indices.
- */
-GLfloat rectangleVertices[] = {
-    // positions        // colors         // texture coords
-    0.5f,  0.5f,  0.0f, 1.0f, 0.7f, 0.0f, 1.0f, 1.0f, // top right
-    0.5f,  -0.5f, 0.0f, 1.0f, 0.7f, 0.0f, 1.0f, 0.0f, // bottom right
-    -0.5f, -0.5f, 0.0f, 1.0f, 0.7f, 0.0f, 0.0f, 0.0f, // bottom left
-    -0.5f, 0.5f,  0.0f, 1.0f, 0.7f, 0.0f, 0.0f, 1.0f, // top left
-};
-
-GLuint rectangleIndices[] = {
-    0, 1, 3, // first triangle
-    1, 2, 3  // second triangle
-};
+#include <glm/glm.hpp>
 
 GLint success;
 GLchar infoLog[512];
@@ -81,9 +38,17 @@ void renderer::init()
     textureShader = new Shader("assets/shaders/vert.vert", "assets/shaders/texture.frag");
     texture = new Texture("crate_1", GL_TEXTURE0);
 
-    triangle = new Triangle(triangleVertices, sizeof(triangleVertices), colorShader, nullptr);
-    rectangle = new Quad(rectangleVertices, sizeof(rectangleVertices), rectangleIndices, sizeof(rectangleIndices),
-                         textureShader, texture);
+    float triH = 1.0f;
+    float triW = 1.0f;
+    glm::vec3 triColor(1.0f, 1.0f, 1.0f);
+    glm::vec3 triPos(0.0f, 0.0f, 0.0f);
+    triangle = new Triangle(triH, triW, triPos, triColor, textureShader, texture);
+
+    float recH = 1.0f;
+    float recW = 1.0f;
+    glm::vec3 recColor(1.0f, 0.7f, 0.0f);
+    glm::vec3 recPos(0.0f, 0.0f, 0.0f);
+    rectangle = new Quad(recH, recW, recPos, recColor, textureShader, texture);
 }
 
 void renderer::render()

@@ -1,10 +1,11 @@
 #pragma once
 #include "shape.h"
+#include <glm/glm.hpp>
 
 class Triangle : public Shape
 {
   public:
-    Triangle(const float *vertices, size_t vertexByteSize, Shader *shader, Texture *texture);
+    Triangle(float height, float width, glm::vec3 pos, glm::vec3 color, Shader *shader, Texture *texture);
     ~Triangle() {}
     void draw() override;
 };
