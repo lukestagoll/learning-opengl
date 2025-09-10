@@ -6,7 +6,7 @@
 class Quad : public Shape
 {
   public:
-    Quad(float height, float width, glm::vec3 pos, glm::vec3 color, Shader *shader, Texture *texture);
+    Quad(float height, float width, glm::vec3 pos, Shader *shader, Texture *texture);
     ~Quad();
     void draw() override;
 

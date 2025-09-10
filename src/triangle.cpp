@@ -1,14 +1,14 @@
 #include "triangle.h"
 
-Triangle::Triangle(float height, float width, glm::vec3 pos, glm::vec3 color, Shader *shader, Texture *texture)
+Triangle::Triangle(float height, float width, glm::vec3 pos, Shader *shader, Texture *texture)
     : Shape(shader, texture)
 {
     float halfWidth = width / 2;
     float halfHeight = height / 2;
     float vertices[] = {
-        pos.x - halfWidth, pos.y - halfHeight, pos.z, color.x, color.y, color.z, 0.0f, 0.0f,
-        pos.x + halfWidth, pos.y - halfHeight, pos.z, color.x, color.y, color.z, 1.0f, 0.0f,
-        pos.x,             pos.y + halfHeight, pos.z, color.x, color.y, color.z, 0.5f, 1.0f,
+        pos.x - halfWidth, pos.y - halfHeight, pos.z, 0.0f, 0.0f,
+        pos.x + halfWidth, pos.y - halfHeight, pos.z, 1.0f, 0.0f,
+        pos.x,             pos.y + halfHeight, pos.z, 0.5f, 1.0f,
     };
 
     init(vertices, sizeof(vertices));

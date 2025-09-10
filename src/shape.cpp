@@ -44,23 +44,20 @@ void Shape::init(const float *vertices, size_t vertexByteSize)
      *  Our vertex buffer data is an array, so we need to tell OpenGL how to interpret the data for use in the
      *  vertex shader
      *
-     *            ┌───────────────────────────────────────────────┬───────────────────────────────────────────────┬─────┐
-     *            │                   Vertex 1                    │                   Vertex 2                    │ ... │
-     *            ├─────────────────┬─────────────────┬───────────┼─────────────────┬─────────────────┬───────────┼─────┤
-     *            │     Position    │      Color      │  Texture  │     Position    │      Color      │  Texture  │     │
-     *            ├─────┬─────┬─────┼─────┬─────┬─────┼─────┬─────┼─────┬─────┬─────┼─────┬─────┬─────┼─────┬─────┼─────┤
-     *            │  X  │  Y  │  Z  │  R  │  G  │  B  │  S  │  T  │  X  │  Y  │  Z  │  R  │  G  │  B  │  S  │  T  │ ... │
-     *            └─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┘
-     *      BYTE: 0     4     8     12    16    20    24    28    32    36    40    44    48    52    56    60    64
+     *            ┌─────────────────────────────┬─────────────────────────────┬─────┐
+     *            │           Vertex 1          │           Vertex 2          │ ... │
+     *            ├─────────────────┬───────────┼─────────────────┬───────────┼─────┤
+     *            │     Position    │  Texture  │     Position    │  Texture  │     │
+     *            ├─────┬─────┬─────┼─────┬─────┼─────┬─────┬─────┼─────┬─────┼─────┤
+     *            │  X  │  Y  │  Z  │  S  │  T  │  X  │  Y  │  Z  │  S  │  T  │ ... │
+     *            └─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┘
+     *      BYTE: 0     4     8     12    16    20    24    28    32    36    40
      *
-     *  POSITION: ────────────────── STRIDE: 32 ─────────────────➤
+     *  POSITION: ───────── STRIDE: 20 ────────➤
      *            ─ OFFSET: 0
      *
-     *     COLOR:                   ────────────────── STRIDE: 32 ─────────────────➤
+     *   TEXTURE:                   ───────── STRIDE: 20 ────────➤
      *            ── OFFSET: 12 ──➤
-     *
-     *    TEXTURE:                                    ────────────────── STRIDE: 32 ─────────────────➤
-     *            ─────────── OFFSET: 24 ───────────➤
      *
      *  3 floats per vertex
      *
@@ -78,10 +75,7 @@ void Shape::init(const float *vertices, size_t vertexByteSize)
     // position attribute
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, Shape::vertexStride * sizeof(float), (void *)0);
     glEnableVertexAttribArray(0);
-    // color attribute
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, Shape::vertexStride * sizeof(float), (void *)(3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
     // texture attribute
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, Shape::vertexStride * sizeof(float), (void *)(6 * sizeof(float)));
-    glEnableVertexAttribArray(2);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, Shape::vertexStride * sizeof(float), (void *)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
 }

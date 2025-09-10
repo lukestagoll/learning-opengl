@@ -1,7 +1,7 @@
 #include "quad.h"
 #include <iostream>
 
-Quad::Quad(float height, float width, glm::vec3 pos, glm::vec3 color, Shader *shader, Texture *texture)
+Quad::Quad(float height, float width, glm::vec3 pos, Shader *shader, Texture *texture)
     : Shape(shader, texture), height_(height), width_(width)
 {
     float halfWidth = width / 2;
@@ -29,10 +29,10 @@ Quad::Quad(float height, float width, glm::vec3 pos, glm::vec3 color, Shader *sh
      *  This is done using an array of indices.
      */
     float vertices[] = {
-        pos.x + halfWidth, pos.y + halfHeight, pos.z, color.x, color.y, color.z, 1.0f, 1.0f,
-        pos.x + halfWidth, pos.y - halfHeight, pos.z, color.x, color.y, color.z, 1.0f, 0.0f,
-        pos.x - halfWidth, pos.y - halfHeight, pos.z, color.x, color.y, color.z, 0.0f, 0.0f,
-        pos.x - halfWidth, pos.y + halfHeight, pos.z, color.x, color.y, color.z, 0.0f, 1.0f,
+        pos.x + halfWidth, pos.y + halfHeight, pos.z, 1.0f, 1.0f,
+        pos.x + halfWidth, pos.y - halfHeight, pos.z, 1.0f, 0.0f,
+        pos.x - halfWidth, pos.y - halfHeight, pos.z, 0.0f, 0.0f,
+        pos.x - halfWidth, pos.y + halfHeight, pos.z, 0.0f, 1.0f,
     };
     init(vertices, sizeof(vertices));
 

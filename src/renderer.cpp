@@ -40,15 +40,13 @@ void renderer::init()
 
     float triH = 1.0f;
     float triW = 1.0f;
-    glm::vec3 triColor(1.0f, 1.0f, 1.0f);
     glm::vec3 triPos(0.0f, 0.0f, 0.0f);
-    triangle = new Triangle(triH, triW, triPos, triColor, textureShader, texture);
+    triangle = new Triangle(triH, triW, triPos, textureShader, texture);
 
     float recH = 1.0f;
     float recW = 1.0f;
-    glm::vec3 recColor(1.0f, 0.7f, 0.0f);
     glm::vec3 recPos(0.0f, 0.0f, 0.0f);
-    rectangle = new Quad(recH, recW, recPos, recColor, textureShader, texture);
+    rectangle = new Quad(recH, recW, recPos, textureShader, texture);
 }
 
 void renderer::render()
