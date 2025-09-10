@@ -18,9 +18,15 @@ add_subdirectory(external/SDL EXCLUDE_FROM_ALL)
 add_library(glad external/glad/src/glad.c)
 target_include_directories(glad PUBLIC external/glad/include)
 
+add_library(stb_image external/stb_image/src/stb_image.c)
+target_include_directories(stb_image PUBLIC external/stb_image/include)
+
 set(SOURCES
     src/renderer.cpp
     src/shader.cpp
+    src/texture.cpp
+    src/triangle.cpp
+    src/quad.cpp
 )
 
 add_executable(learning-opengl
@@ -30,7 +36,7 @@ add_executable(learning-opengl
 
 target_include_directories(learning-opengl PRIVATE "${CMAKE_SOURCE_DIR}/include")
 
-target_link_libraries(learning-opengl PRIVATE glad SDL3::SDL3)
+target_link_libraries(learning-opengl PRIVATE glad stb_image SDL3::SDL3)
 
 if (WIN32)
   target_link_libraries(learning-opengl PRIVATE opengl32)
@@ -46,11 +52,10 @@ set_target_properties(learning-opengl PROPERTIES
     OUTPUT_NAME "learning-opengl"
 )
 
-file(GLOB SHADERS "${CMAKE_SOURCE_DIR}/shaders/*.glsl")
 add_custom_command(TARGET learning-opengl POST_BUILD
   COMMAND ${CMAKE_COMMAND} -E copy_directory
-          ${CMAKE_SOURCE_DIR}/shaders
-          $<TARGET_FILE_DIR:learning-opengl>/shaders)
+          ${CMAKE_SOURCE_DIR}/assets
+          $<TARGET_FILE_DIR:learning-opengl>/assets)
 
 # ---------- Optimisations ----------
 

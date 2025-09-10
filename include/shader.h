@@ -2,7 +2,6 @@
 
 #include <glad/glad.h>
 
-#include <cstdint>
 #include <string>
 
 enum class ShaderType
@@ -18,7 +17,7 @@ class Shader
     Shader(const char *vertexPath, const char *fragmentPath);
     ~Shader();
 
-    uint32_t getID() const
+    GLuint getID() const
     {
         return id_;
     }
@@ -32,9 +31,9 @@ class Shader
     void setFloat(const std::string &name, float value) const;
 
   private:
-    uint32_t id_;
-    void checkCompileErrors(uint32_t shader, ShaderType type);
+    GLuint id_;
+    void checkCompileErrors(GLuint shader, ShaderType type);
     std::string loadFile(const char *filePath);
-    uint32_t compileShader(ShaderType type, const char *shaderSourceCode);
-    void createProgram(uint32_t vertexShader, uint32_t fragmentShader);
+    GLuint compileShader(ShaderType type, const char *shaderSourceCode);
+    void createProgram(GLuint vertexShader, GLuint fragmentShader);
 };
