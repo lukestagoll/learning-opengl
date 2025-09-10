@@ -11,9 +11,10 @@
 GLint success;
 GLchar infoLog[512];
 
-Shader *colorShader = nullptr;
-Shader *textureShader = nullptr;
-Texture *texture = nullptr;
+Shader *triangleShader = nullptr;
+Shader *rectangleShader = nullptr;
+Texture *triangleTexture = nullptr;
+Texture *rectangleTexture = nullptr;
 Triangle *triangle = nullptr;
 Quad *rectangle = nullptr;
 
@@ -34,19 +35,20 @@ void renderer::swapPolygonMode()
 
 void renderer::init()
 {
-    colorShader = new Shader("assets/shaders/vert.vert", "assets/shaders/color.frag");
-    textureShader = new Shader("assets/shaders/vert.vert", "assets/shaders/texture.frag");
-    texture = new Texture("crate_1", GL_TEXTURE0);
+    triangleShader = new Shader("assets/shaders/vert.vert", "assets/shaders/texture.frag");
+    rectangleShader = new Shader("assets/shaders/vert.vert", "assets/shaders/texture.frag");
+    triangleTexture = new Texture("lamp_1_emission", GL_TEXTURE0);
+    rectangleTexture = new Texture("crate_1", GL_TEXTURE0);
 
     float triH = 0.75f;
     float triW = 0.75f;
-    glm::vec3 triPos(-0.33f, -0.33f, 0.0f);
-    triangle = new Triangle(triH, triW, triPos, textureShader, texture);
+    glm::vec3 triPos(0.0f, 0.0f, 0.0f);
+    triangle = new Triangle(triH, triW, triPos, triangleShader, triangleTexture);
 
     float recH = 0.75f;
     float recW = 0.75f;
-    glm::vec3 recPos(0.33f, 0.33f, 0.0f);
-    rectangle = new Quad(recH, recW, recPos, textureShader, texture);
+    glm::vec3 recPos(0.0f, 0.0f, 0.0f);
+    rectangle = new Quad(recH, recW, recPos, rectangleShader, rectangleTexture);
 }
 
 void renderer::render()
@@ -73,9 +75,10 @@ void renderer::render()
 
 void renderer::cleanup()
 {
-    delete colorShader;
-    delete textureShader;
-    delete texture;
+    delete triangleShader;
+    delete rectangleShader;
+    delete triangleTexture;
+    delete rectangleTexture;
     delete triangle;
     delete rectangle;
 }

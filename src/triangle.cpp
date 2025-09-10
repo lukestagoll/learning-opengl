@@ -19,7 +19,13 @@ Triangle::Triangle(float height, float width, glm::vec3 pos, Shader *shader, Tex
 
 void Triangle::draw()
 {
+    texture_->use();
     shader_->use();
+
+    glm::vec3 translate(-0.33f, -0.33f, 0.0f);
+    glm::vec3 rotate(0.0f, 1.0f, 0.0f);
+    transform(translate, rotate);
+
     glBindVertexArray(vao_);
     glDrawArrays(GL_TRIANGLES, 0, 3);
 }

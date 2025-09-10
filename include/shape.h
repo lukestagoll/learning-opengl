@@ -3,12 +3,15 @@
 #include "shader.h"
 #include "texture.h"
 
+#include <glm/glm.hpp>
+
 #include <cstddef>
 
 class Shape
 {
   public:
     virtual void draw() = 0;
+    void transform(glm::vec3 translate, glm::vec3 rotate);
 
   protected:
     Shape(Shader *shader, Texture *texture) : shader_(shader), texture_(texture) {}

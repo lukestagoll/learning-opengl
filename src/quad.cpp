@@ -1,12 +1,10 @@
 #include "quad.h"
-#include <iostream>
 
 Quad::Quad(float height, float width, glm::vec3 pos, Shader *shader, Texture *texture)
     : Shape(shader, texture), height_(height), width_(width)
 {
     float halfWidth = width / 2;
     float halfHeight = height / 2;
-    std::cout << pos.x + halfWidth << std::endl;
 
     /*
      *  If we want to draw a rectangle we can do so by drawing two triangles using the follwoing verticies:
@@ -63,6 +61,11 @@ void Quad::draw()
 {
     texture_->use();
     shader_->use();
+
+    glm::vec3 translate(0.33f, 0.33f, 0.0f);
+    glm::vec3 rotate(1.0f, 1.0f, 1.0f);
+    transform(translate, rotate);
+
     glBindVertexArray(vao_);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }

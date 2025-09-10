@@ -5,6 +5,8 @@
 #include <iostream>
 #include <sstream>
 
+#include <glm/gtc/type_ptr.hpp>
+
 Shader::Shader(const char *vertexPath, const char *fragmentPath)
 {
     std::string vertexCode = loadFile(vertexPath);
@@ -31,6 +33,12 @@ Shader::~Shader()
 void Shader::use()
 {
     glUseProgram(id_);
+}
+
+void Shader::setTransform(glm::mat4 transform)
+{
+    GLuint transformLoc = glGetUniformLocation(id_, "transform");
+    glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transform));
 }
 
 void Shader::setBool(const std::string &name, bool value) const

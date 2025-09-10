@@ -1,5 +1,9 @@
 #include "shape.h"
 
+#include <SDL3/SDL.h>
+
+#include <glm/gtc/matrix_transform.hpp>
+
 Shape::~Shape()
 {
     glDeleteVertexArrays(1, &vao_);
@@ -78,4 +82,12 @@ void Shape::init(const float *vertices, size_t vertexByteSize)
     // texture attribute
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, Shape::vertexStride * sizeof(float), (void *)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
+}
+
+void Shape::transform(glm::vec3 translate, glm::vec3 rotate)
+{
+    glm::mat4 transform = glm::mat4(1.0f); // initialize to identity matrix
+    transform = glm::translate(transform, translate);
+    transform = glm::rotate(transform, SDL_GetTicks() / 1000.0f, rotate);
+    shader_->setTransform(transform);
 }

@@ -1,5 +1,5 @@
 #define SDL_MAIN_USE_CALLBACKS 1
-#define WINDOW_HEIGHT 720
+#define WINDOW_HEIGHT 1280
 #define WINDOW_WIDTH 1280
 #include <cmath>
 
@@ -111,7 +111,6 @@ SDL_AppResult SDL_AppIterate(void *appstate)
 {
     AppState *state = static_cast<AppState *>(appstate);
 
-    // updateColor();
     renderer::render();
 
     SDL_GL_SwapWindow(state->window);
