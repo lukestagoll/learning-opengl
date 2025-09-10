@@ -5,7 +5,7 @@ namespace renderer
 {
     void render();
     void init();
-    void swapShape();
+    void nextScene();
     void swapPolygonMode();
     void cleanup();
 };

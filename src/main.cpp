@@ -84,7 +84,7 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event)
             renderer::swapPolygonMode();
             break;
         case SDL_SCANCODE_SPACE:
-            renderer::swapShape();
+            renderer::nextScene();
             break;
         default:
             break;

@@ -17,13 +17,13 @@ Texture *texture = nullptr;
 Triangle *triangle = nullptr;
 Quad *rectangle = nullptr;
 
-bool drawTriangle = true;
+int scene = 0;
 
 GLenum polygonMode = GL_FILL;
 
-void renderer::swapShape()
+void renderer::nextScene()
 {
-    drawTriangle = !drawTriangle;
+    scene = (scene + 1) % 3;
 }
 
 void renderer::swapPolygonMode()
@@ -38,14 +38,14 @@ void renderer::init()
     textureShader = new Shader("assets/shaders/vert.vert", "assets/shaders/texture.frag");
     texture = new Texture("crate_1", GL_TEXTURE0);
 
-    float triH = 1.0f;
-    float triW = 1.0f;
-    glm::vec3 triPos(0.0f, 0.0f, 0.0f);
+    float triH = 0.75f;
+    float triW = 0.75f;
+    glm::vec3 triPos(-0.33f, -0.33f, 0.0f);
     triangle = new Triangle(triH, triW, triPos, textureShader, texture);
 
-    float recH = 1.0f;
-    float recW = 1.0f;
-    glm::vec3 recPos(0.0f, 0.0f, 0.0f);
+    float recH = 0.75f;
+    float recW = 0.75f;
+    glm::vec3 recPos(0.33f, 0.33f, 0.0f);
     rectangle = new Quad(recH, recW, recPos, textureShader, texture);
 }
 
@@ -54,13 +54,18 @@ void renderer::render()
     glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    if (drawTriangle)
+    switch (scene)
     {
+    case 0:
         triangle->draw();
-    }
-    else
-    {
+        break;
+    case 1:
         rectangle->draw();
+        break;
+    case 2:
+        triangle->draw();
+        rectangle->draw();
+        break;
     }
 
     glBindVertexArray(0);
