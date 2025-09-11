@@ -33,7 +33,7 @@ class Shader
 
     void setProjection(GLfloat degrees);
     void setView(glm::vec3 translate);
-    void setModel(GLfloat degrees);
+    void setModel(glm::vec3 pos, GLfloat rot);
 
   private:
     GLuint id_;

@@ -11,14 +11,14 @@
 class Cube
 {
   public:
-    Cube(glm::vec3 size, glm::vec3 pos, Shader *shader, Texture *texture);
+    Cube(glm::vec3 size, Shader *shader, Texture *texture);
     ~Cube();
+    void bind();
     void draw();
     void transform(glm::vec3 translate, glm::vec3 rotate);
 
   private:
     glm::vec3 size_;
-    glm::vec3 pos_;
 
     static constexpr size_t vertexStride = 5; // 3 pos vertices, 2 tex coord vertices
     unsigned int vao_;

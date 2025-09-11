@@ -1,11 +1,10 @@
 #include "cube.h"
 
-#include <SDL3/SDL.h>
 
 #include <glm/gtc/matrix_transform.hpp>
 
-Cube::Cube(glm::vec3 size, glm::vec3 pos, Shader *shader, Texture *texture)
-    : size_(size), pos_(pos), shader_(shader), texture_(texture)
+Cube::Cube(glm::vec3 size, Shader *shader, Texture *texture)
+    : size_(size), shader_(shader), texture_(texture)
 {
     float halfWidth = size.x / 2;
     float halfHeight = size.y / 2;
@@ -33,40 +32,40 @@ Cube::Cube(glm::vec3 size, glm::vec3 pos, Shader *shader, Texture *texture)
      */
     float vertices[] = {
         // front (+Z)
-        pos.x + halfWidth, pos.y + halfHeight, pos.z + halfDepth, 1.0f, 1.0f,
-        pos.x + halfWidth, pos.y - halfHeight, pos.z + halfDepth, 1.0f, 0.0f,
-        pos.x - halfWidth, pos.y - halfHeight, pos.z + halfDepth, 0.0f, 0.0f,
-        pos.x - halfWidth, pos.y + halfHeight, pos.z + halfDepth, 0.0f, 1.0f,
+        halfWidth,  halfHeight, halfDepth, 1.0f, 1.0f,
+        halfWidth, -halfHeight, halfDepth, 1.0f, 0.0f,
+        -halfWidth,-halfHeight, halfDepth, 0.0f, 0.0f,
+        -halfWidth, halfHeight, halfDepth, 0.0f, 1.0f,
 
         // back (-Z)
-        pos.x + halfWidth, pos.y + halfHeight, pos.z - halfDepth, 0.0f, 1.0f,
-        pos.x + halfWidth, pos.y - halfHeight, pos.z - halfDepth, 0.0f, 0.0f,
-        pos.x - halfWidth, pos.y - halfHeight, pos.z - halfDepth, 1.0f, 0.0f,
-        pos.x - halfWidth, pos.y + halfHeight, pos.z - halfDepth, 1.0f, 1.0f,
+        halfWidth,  halfHeight,-halfDepth, 0.0f, 1.0f,
+        halfWidth, -halfHeight,-halfDepth, 0.0f, 0.0f,
+        -halfWidth,-halfHeight,-halfDepth, 1.0f, 0.0f,
+        -halfWidth, halfHeight,-halfDepth, 1.0f, 1.0f,
 
         // back (+X)
-        pos.x + halfWidth, pos.y + halfHeight, pos.z - halfDepth, 1.0f, 1.0f,
-        pos.x + halfWidth, pos.y - halfHeight, pos.z - halfDepth, 1.0f, 0.0f,
-        pos.x + halfWidth, pos.y - halfHeight, pos.z + halfDepth, 0.0f, 0.0f,
-        pos.x + halfWidth, pos.y + halfHeight, pos.z + halfDepth, 0.0f, 1.0f,
+        halfWidth,  halfHeight,-halfDepth, 1.0f, 1.0f,
+        halfWidth, -halfHeight,-halfDepth, 1.0f, 0.0f,
+        halfWidth, -halfHeight, halfDepth, 0.0f, 0.0f,
+        halfWidth,  halfHeight, halfDepth, 0.0f, 1.0f,
 
         // back (-X)
-        pos.x - halfWidth, pos.y + halfHeight, pos.z + halfDepth, 1.0f, 1.0f,
-        pos.x - halfWidth, pos.y - halfHeight, pos.z + halfDepth, 1.0f, 0.0f,
-        pos.x - halfWidth, pos.y - halfHeight, pos.z - halfDepth, 0.0f, 0.0f,
-        pos.x - halfWidth, pos.y + halfHeight, pos.z - halfDepth, 0.0f, 1.0f,
+        -halfWidth, halfHeight, halfDepth, 1.0f, 1.0f,
+        -halfWidth,-halfHeight, halfDepth, 1.0f, 0.0f,
+        -halfWidth,-halfHeight,-halfDepth, 0.0f, 0.0f,
+        -halfWidth, halfHeight,-halfDepth, 0.0f, 1.0f,
 
         // back (+Y)
-        pos.x + halfWidth, pos.y + halfHeight, pos.z - halfDepth, 1.0f, 0.0f,
-        pos.x - halfWidth, pos.y + halfHeight, pos.z - halfDepth, 0.0f, 0.0f,
-        pos.x - halfWidth, pos.y + halfHeight, pos.z + halfDepth, 0.0f, 1.0f,
-        pos.x + halfWidth, pos.y + halfHeight, pos.z + halfDepth, 1.0f, 1.0f,
+        halfWidth,  halfHeight,-halfDepth, 1.0f, 0.0f,
+        -halfWidth, halfHeight,-halfDepth, 0.0f, 0.0f,
+        -halfWidth, halfHeight, halfDepth, 0.0f, 1.0f,
+        halfWidth,  halfHeight, halfDepth, 1.0f, 1.0f,
 
         // back (-Y)
-        pos.x + halfWidth, pos.y - halfHeight, pos.z + halfDepth, 1.0f, 0.0f,
-        pos.x - halfWidth, pos.y - halfHeight, pos.z + halfDepth, 0.0f, 0.0f,
-        pos.x - halfWidth, pos.y - halfHeight, pos.z - halfDepth, 0.0f, 1.0f,
-        pos.x + halfWidth, pos.y - halfHeight, pos.z - halfDepth, 1.0f, 1.0f,
+        halfWidth, -halfHeight, halfDepth, 1.0f, 0.0f,
+        -halfWidth,-halfHeight, halfDepth, 0.0f, 0.0f,
+        -halfWidth,-halfHeight,-halfDepth, 0.0f, 1.0f,
+        halfWidth, -halfHeight,-halfDepth, 1.0f, 1.0f,
     };
 
     int indices[] = {
@@ -125,17 +124,12 @@ Cube::~Cube()
     glDeleteBuffers(1, &vbo_);
 }
 
+void Cube::bind()
+{
+    glBindVertexArray(vao_);
+}
+
 void Cube::draw()
 {
-    texture_->use();
-    shader_->use();
-
-    glm::vec3 translate(0.0f, 0.0f, -3.0f);
-
-    shader_->setProjection(glm::radians(45.0f));
-    shader_->setView(translate);
-    shader_->setModel(SDL_GetTicks() / 1000.0f * glm::radians(-55.0f));
-
-    glBindVertexArray(vao_);
     glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 }

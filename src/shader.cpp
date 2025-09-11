@@ -6,6 +6,8 @@
 #include <iostream>
 #include <sstream>
 
+#include <SDL3/SDL.h>
+
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
@@ -47,16 +49,21 @@ void Shader::setProjection(GLfloat degrees)
 
 void Shader::setView(glm::vec3 translate)
 {
-    glm::mat4 view = glm::mat4(1.0f);
-    view = glm::translate(view, translate);
+    glm::mat4 view = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
+    float radius = 10.0f;
+    float time = SDL_GetTicks() / 1000.0f;
+    float camX = static_cast<float>(sin(time) * radius);
+    float camZ = static_cast<float>(cos(time) * radius);
+    view = glm::lookAt(glm::vec3(camX, 0.0f, camZ), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
     int viewLoc = glGetUniformLocation(id_, "view");
     glUniformMatrix4fv(viewLoc, 1, GL_FALSE, &view[0][0]);
 }
 
-void Shader::setModel(GLfloat degrees)
+void Shader::setModel(glm::vec3 pos, GLfloat rot)
 {
     glm::mat4 model = glm::mat4(1.0f);
-    model = glm::rotate(model, degrees, glm::vec3(0.5f, 1.0f, 0.0f));
+    model = glm::translate(model, pos);
+    model = glm::rotate(model, rot, pos);
     int modelLoc = glGetUniformLocation(id_, "model");
     glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 }

@@ -7,6 +7,8 @@
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 
+#include <SDL3/SDL.h>
+
 GLint success;
 GLchar infoLog[512];
 
@@ -17,6 +19,18 @@ Cube *cube = nullptr;
 int scene = 0;
 
 GLenum polygonMode = GL_FILL;
+
+
+// world space positions of our cubes
+glm::vec3 cubePositions[] = {
+    glm::vec3(0.0f, 0.0f, 1.0f),
+    glm::vec3(3.0f, 1.0f, 1.0f),
+    glm::vec3(1.0f, 1.0f, 3.0f),
+    glm::vec3(1.0f, 3.0f, 1.0f),
+    glm::vec3(-3.0f, -1.0f, -1.0f),
+    glm::vec3(-1.0f, -1.0f, -3.0f),
+    glm::vec3(-1.0f, -3.0f, -1.0f),
+};
 
 void renderer::nextScene()
 {
@@ -35,8 +49,8 @@ void renderer::init()
     rectangleTexture = new Texture("crate_1", GL_TEXTURE0);
 
     glm::vec3 recSize(1.0f, 1.0f, 1.0f);
-    glm::vec3 recPos(0.0f, 0.0f, 0.0f);
-    cube = new Cube(recSize, recPos, rectangleShader, rectangleTexture);
+    cube = new Cube(recSize, rectangleShader, rectangleTexture);
+    rectangleShader->setProjection(glm::radians(45.0f));
 
     glEnable(GL_DEPTH_TEST);
 }
@@ -46,7 +60,18 @@ void renderer::render()
     glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    cube->draw();
+    rectangleShader->use();
+    rectangleTexture->use();
+    glm::vec3 translate(0.0f, 0.0f, -3.0f);
+
+    rectangleShader->setView(translate);
+
+    cube->bind();
+    for (int i = 0; i < 7; i++)
+    {
+        rectangleShader->setModel(cubePositions[i], glm::radians(20.0f * i));
+        cube->draw();
+    }
 
     glBindVertexArray(0);
 }
