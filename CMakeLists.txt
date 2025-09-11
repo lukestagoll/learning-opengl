@@ -25,6 +25,7 @@ target_include_directories(stb_image PUBLIC external/stb_image/include)
 set(SOURCES
     src/renderer.cpp
     src/shader.cpp
+    src/camera.cpp
     src/cube.cpp
     src/texture.cpp
 )

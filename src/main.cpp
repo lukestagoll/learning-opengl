@@ -1,3 +1,4 @@
+#include "SDL3/SDL_scancode.h"
 #define SDL_MAIN_USE_CALLBACKS 1
 #include <cmath>
 
@@ -8,11 +9,15 @@
 
 #include "constants.h"
 #include "renderer.h"
+#include "camera.h"
 
 typedef struct
 {
     SDL_Window *window;
     SDL_GLContext glContext;
+    Camera *camera;
+    float lastFrame = 0.0f;
+    float deltaTime = 0.0f;
 } AppState;
 
 typedef struct
@@ -55,9 +60,12 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
         return SDL_APP_FAILURE;
     }
 
+    Camera *camera = new Camera(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+
     AppState *state = static_cast<AppState *>(SDL_calloc(1, sizeof(AppState)));
     state->window = window;
     state->glContext = glContext;
+    state->camera = camera;
     *appstate = state;
 
     renderer::init();
@@ -85,11 +93,48 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event)
         case SDL_SCANCODE_SPACE:
             renderer::nextScene();
             break;
+        case SDL_SCANCODE_W:
+            state->camera->setForward(true);
+            break;
+        case SDL_SCANCODE_S:
+            state->camera->setBack(true);
+            break;
+        case SDL_SCANCODE_A:
+            state->camera->setLeft(true);
+            break;
+        case SDL_SCANCODE_D:
+            state->camera->setRight(true);
+            break;
+        case SDL_SCANCODE_LSHIFT:
+            state->camera->setSprint(true);
+            break;
         default:
             break;
         }
         break;
 
+    case SDL_EVENT_KEY_UP:
+        switch (event->key.scancode)
+        {
+        case SDL_SCANCODE_W:
+            state->camera->setForward(false);
+            break;
+        case SDL_SCANCODE_S:
+            state->camera->setBack(false);
+            break;
+        case SDL_SCANCODE_A:
+            state->camera->setLeft(false);
+            break;
+        case SDL_SCANCODE_D:
+            state->camera->setRight(false);
+            break;
+        case SDL_SCANCODE_LSHIFT:
+            state->camera->setSprint(false);
+            break;
+        default:
+            break;
+        }
+        break;
     case SDL_EVENT_WINDOW_RESIZED:
         glViewport(0, 0, event->window.data1, event->window.data2);
         break;
@@ -98,19 +143,17 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event)
     return SDL_APP_CONTINUE;
 }
 
-void updateColor()
-{
-    float time = SDL_GetTicks() / 1000.0f;
-    float red = 0.0f;
-    float green = std::sin(time) / 2.0f + 0.5f;
-    float blue = 0.0f;
-}
-
 SDL_AppResult SDL_AppIterate(void *appstate)
 {
     AppState *state = static_cast<AppState *>(appstate);
 
-    renderer::render();
+    float currentFrame = SDL_GetTicks() / 1000.0f;
+    state->deltaTime = currentFrame - state->lastFrame;
+    state->lastFrame = currentFrame;
+
+    state->camera->updatePos(state->deltaTime);
+
+    renderer::render(state->camera);
 
     SDL_GL_SwapWindow(state->window);
     return SDL_APP_CONTINUE;

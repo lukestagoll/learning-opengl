@@ -39,22 +39,14 @@ void Shader::use()
     glUseProgram(id_);
 }
 
-void Shader::setProjection(GLfloat degrees)
+void Shader::setProjection(glm::mat4 projection)
 {
-    glm::mat4 projection = glm::mat4(1.0f);
-    projection = glm::perspective(degrees, (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT, 0.1f, 100.0f);
     int projectionLoc = glGetUniformLocation(id_, "projection");
     glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
 }
 
-void Shader::setView(glm::vec3 translate)
+void Shader::setView(glm::mat4 view)
 {
-    glm::mat4 view = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
-    float radius = 10.0f;
-    float time = SDL_GetTicks() / 1000.0f;
-    float camX = static_cast<float>(sin(time) * radius);
-    float camZ = static_cast<float>(cos(time) * radius);
-    view = glm::lookAt(glm::vec3(camX, 0.0f, camZ), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
     int viewLoc = glGetUniformLocation(id_, "view");
     glUniformMatrix4fv(viewLoc, 1, GL_FALSE, &view[0][0]);
 }
