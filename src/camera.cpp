@@ -1,5 +1,8 @@
 #include "camera.h"
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 glm::mat4 Camera::getViewMatrix() const
 {
     return glm::lookAt(pos_, pos_ + front_, up_);
@@ -36,11 +39,29 @@ void Camera::setRight(bool right)
     moveRight_ = right;
 }
 
+void Camera::setYaw(float xrel)
+{
+    yaw_ += xrel * sensitivity_;
+}
+
+void Camera::setPitch(float yrel)
+{
+    pitch_ -= yrel * sensitivity_;
+    if (pitch_ > 89.0f)
+    {
+        pitch_ = 89.0f;
+    }
+    if (pitch_ < -89.0f)
+    {
+        pitch_ = -89.0f;
+    }
+}
+
 void Camera::updatePos(float deltaTime)
 {
     if (moveForward_ && !moveBack_)
     {
-        pos_ += ((sprint_ ? sprintSpeed_ : movSpeed_)*deltaTime) * front_;
+        pos_ += ((sprint_ ? sprintSpeed_ : movSpeed_) * deltaTime) * front_;
     }
     else if (moveBack_ && !moveForward_)
     {
@@ -55,4 +76,13 @@ void Camera::updatePos(float deltaTime)
     {
         pos_ += glm::normalize(glm::cross(front_, up_)) * (movSpeed_ * deltaTime);
     }
+}
+
+void Camera::updateDir()
+{
+    glm::vec3 direction;
+    direction.x = cos(glm::radians(yaw_)) * cos(glm::radians(pitch_));
+    direction.y = sin(glm::radians(pitch_));
+    direction.z = sin(glm::radians(yaw_)) * cos(glm::radians(pitch_));
+    front_ = glm::normalize(direction);
 }
