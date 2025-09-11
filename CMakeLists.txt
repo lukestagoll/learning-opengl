@@ -23,11 +23,11 @@ add_library(stb_image external/stb_image/src/stb_image.c)
 target_include_directories(stb_image PUBLIC external/stb_image/include)
 
 set(SOURCES
-    src/renderer.cpp
-    src/shader.cpp
-    src/camera.cpp
-    src/cube.cpp
-    src/texture.cpp
+    src/core/renderer.cpp
+    src/graphics/shader.cpp
+    src/graphics/camera.cpp
+    src/graphics/texture.cpp
+    src/objects/cube.cpp
 )
 
 add_executable(learning-opengl
@@ -35,7 +35,12 @@ add_executable(learning-opengl
     ${SOURCES}
 )
 
-target_include_directories(learning-opengl PRIVATE "${CMAKE_SOURCE_DIR}/include")
+target_include_directories(learning-opengl PRIVATE
+    "${CMAKE_SOURCE_DIR}/include"
+    "${CMAKE_SOURCE_DIR}/include/core"
+    "${CMAKE_SOURCE_DIR}/include/graphics"
+    "${CMAKE_SOURCE_DIR}/include/objects"
+)
 
 target_link_libraries(learning-opengl PRIVATE glad stb_image SDL3::SDL3 glm)
 
