@@ -1,5 +1,4 @@
 #include "shader.h"
-#include "constants.h"
 
 #include <cstdint>
 #include <fstream>
@@ -42,7 +41,7 @@ void Shader::use()
 void Shader::setProjection(glm::mat4 projection)
 {
     int projectionLoc = glGetUniformLocation(id_, "projection");
-    glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
+    glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, &projection[0][0]);
 }
 
 void Shader::setView(glm::mat4 view)
@@ -73,6 +72,16 @@ void Shader::setInt(const std::string &name, int value) const
 void Shader::setFloat(const std::string &name, float value) const
 {
     glUniform1f(glGetUniformLocation(id_, name.c_str()), value);
+}
+
+void Shader::setVec3(const std::string &name, glm::vec3 value)
+{
+    glUniform3f(glGetUniformLocation(id_, name.c_str()), value.x, value.y, value.z);
+}
+
+void Shader::setMat4(const std::string &name, const glm::mat4 &mat)
+{
+    glUniformMatrix4fv(glGetUniformLocation(id_, name.c_str()), 1, GL_FALSE, &mat[0][0]);
 }
 
 /* Private Functions */

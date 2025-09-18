@@ -20,7 +20,7 @@ class Cube
   private:
     glm::vec3 size_;
 
-    static constexpr size_t vertexStride = 5; // 3 pos vertices, 2 tex coord vertices
+    static constexpr size_t vertexStride = 8; // 3 pos vertices, 3 normals, 2 tex coord vertices
     unsigned int vao_;
     unsigned int vbo_;
     unsigned int ebo_;

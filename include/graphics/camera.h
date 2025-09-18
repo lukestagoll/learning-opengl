@@ -12,6 +12,8 @@ class Camera
     glm::mat4 getViewMatrix() const;
     glm::mat4 getProjection(float aspect, float nearPlane = 0.1f, float farPlane = 100.0f) const;
 
+    glm::vec3 getPosition() const { return pos_; };
+
     void setSprint(bool sprint);
     void setForward(bool forward);
     void setBack(bool back);

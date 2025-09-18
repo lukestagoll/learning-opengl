@@ -32,40 +32,41 @@ Cube::Cube(glm::vec3 size, Shader *shader, Texture *texture)
      */
     float vertices[] = {
         // front (+Z)
-        halfWidth,  halfHeight, halfDepth, 1.0f, 1.0f,
-        halfWidth, -halfHeight, halfDepth, 1.0f, 0.0f,
-        -halfWidth,-halfHeight, halfDepth, 0.0f, 0.0f,
-        -halfWidth, halfHeight, halfDepth, 0.0f, 1.0f,
+        // position                        // normals        // texture coords
+        halfWidth,  halfHeight, halfDepth, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
+        halfWidth, -halfHeight, halfDepth, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f,
+        -halfWidth,-halfHeight, halfDepth, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+        -halfWidth, halfHeight, halfDepth, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f,
 
         // back (-Z)
-        halfWidth,  halfHeight,-halfDepth, 0.0f, 1.0f,
-        halfWidth, -halfHeight,-halfDepth, 0.0f, 0.0f,
-        -halfWidth,-halfHeight,-halfDepth, 1.0f, 0.0f,
-        -halfWidth, halfHeight,-halfDepth, 1.0f, 1.0f,
+        halfWidth,  halfHeight,-halfDepth, 0.0f, 0.0f, -1.0f, 0.0f, 1.0f,
+        halfWidth, -halfHeight,-halfDepth, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f,
+        -halfWidth,-halfHeight,-halfDepth, 0.0f, 0.0f, -1.0f, 1.0f, 0.0f,
+        -halfWidth, halfHeight,-halfDepth, 0.0f, 0.0f, -1.0f, 1.0f, 1.0f,
 
         // back (+X)
-        halfWidth,  halfHeight,-halfDepth, 1.0f, 1.0f,
-        halfWidth, -halfHeight,-halfDepth, 1.0f, 0.0f,
-        halfWidth, -halfHeight, halfDepth, 0.0f, 0.0f,
-        halfWidth,  halfHeight, halfDepth, 0.0f, 1.0f,
+        halfWidth,  halfHeight,-halfDepth, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f,
+        halfWidth, -halfHeight,-halfDepth, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+        halfWidth, -halfHeight, halfDepth, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+        halfWidth,  halfHeight, halfDepth, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
 
         // back (-X)
-        -halfWidth, halfHeight, halfDepth, 1.0f, 1.0f,
-        -halfWidth,-halfHeight, halfDepth, 1.0f, 0.0f,
-        -halfWidth,-halfHeight,-halfDepth, 0.0f, 0.0f,
-        -halfWidth, halfHeight,-halfDepth, 0.0f, 1.0f,
+        -halfWidth, halfHeight, halfDepth, -1.0f, 0.0f, 0.0f, 1.0f, 1.0f,
+        -halfWidth,-halfHeight, halfDepth, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+        -halfWidth,-halfHeight,-halfDepth, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+        -halfWidth, halfHeight,-halfDepth, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
 
         // back (+Y)
-        halfWidth,  halfHeight,-halfDepth, 1.0f, 0.0f,
-        -halfWidth, halfHeight,-halfDepth, 0.0f, 0.0f,
-        -halfWidth, halfHeight, halfDepth, 0.0f, 1.0f,
-        halfWidth,  halfHeight, halfDepth, 1.0f, 1.0f,
+        halfWidth,  halfHeight,-halfDepth, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,
+        -halfWidth, halfHeight,-halfDepth, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f,
+        -halfWidth, halfHeight, halfDepth, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
+        halfWidth,  halfHeight, halfDepth, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f,
 
         // back (-Y)
-        halfWidth, -halfHeight, halfDepth, 1.0f, 0.0f,
-        -halfWidth,-halfHeight, halfDepth, 0.0f, 0.0f,
-        -halfWidth,-halfHeight,-halfDepth, 0.0f, 1.0f,
-        halfWidth, -halfHeight,-halfDepth, 1.0f, 1.0f,
+        halfWidth, -halfHeight, halfDepth, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f,
+        -halfWidth,-halfHeight, halfDepth, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f,
+        -halfWidth,-halfHeight,-halfDepth, 0.0f, -1.0f, 0.0f, 0.0f, 1.0f,
+        halfWidth, -halfHeight,-halfDepth, 0.0f, -1.0f, 0.0f, 1.0f, 1.0f,
     };
 
     int indices[] = {
@@ -109,9 +110,12 @@ Cube::Cube(glm::vec3 size, Shader *shader, Texture *texture)
     // position attribute
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, Cube::vertexStride * sizeof(float), (void *)0);
     glEnableVertexAttribArray(0);
-    // texture attribute
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, Cube::vertexStride * sizeof(float), (void *)(3 * sizeof(float)));
+    // normals attribute
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, Cube::vertexStride * sizeof(float), (void *)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
+    // texture attribute
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, Cube::vertexStride * sizeof(float), (void *)(6 * sizeof(float)));
+    glEnableVertexAttribArray(2);
 
     shader_->use();
     shader_->setInt("tex0", 0);

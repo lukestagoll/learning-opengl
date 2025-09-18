@@ -1,8 +1,6 @@
 #include "SDL3/SDL_events.h"
 #include "SDL3/SDL_scancode.h"
-#include <iostream>
 #define SDL_MAIN_USE_CALLBACKS 1
-#include <cmath>
 
 #include <glad/glad.h>
 
@@ -87,7 +85,6 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event)
         return SDL_APP_SUCCESS;
 
     case SDL_EVENT_MOUSE_MOTION:
-        std::cout << "mouse movement: yrel=" << event->motion.yrel << ", xrel=" << event->motion.xrel << std::endl;
         state->camera->setYaw(event->motion.xrel);
         state->camera->setPitch(event->motion.yrel);
         break;

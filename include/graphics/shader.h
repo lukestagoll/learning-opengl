@@ -31,6 +31,9 @@ class Shader
     void setInt(const std::string &name, int value) const;
     void setFloat(const std::string &name, float value) const;
 
+    void setVec3(const std::string &name, glm::vec3 value);
+    void setMat4(const std::string &name, const glm::mat4 &mat);
+
     void setProjection(glm::mat4 projection);
     void setView(glm::mat4 view);
     void setModel(glm::vec3 pos, GLfloat rot);
