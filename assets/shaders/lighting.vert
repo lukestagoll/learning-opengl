@@ -19,5 +19,5 @@ void main()
     // inverse operations are expensive - ideally calculate on CPU, not here.
     Normal = mat3(transpose(inverse(model))) * aNormal;
 
-    gl_Position = projection * view * model * vec4(aPos, 1.0);
+    gl_Position = projection * view * vec4(aPos, 1.0);
 }

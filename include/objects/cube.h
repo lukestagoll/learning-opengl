@@ -11,7 +11,7 @@
 class Cube
 {
   public:
-    Cube(glm::vec3 size, Shader *shader, Texture *texture);
+    Cube(glm::vec3 size, Shader *shader, Texture *diff, Texture *spec);
     ~Cube();
     void bind();
     void draw();
@@ -26,5 +26,6 @@ class Cube
     unsigned int ebo_;
 
     Shader *shader_ = nullptr;
-    Texture *texture_ = nullptr;
+    Texture *diff_ = nullptr;
+    Texture *spec_ = nullptr;
 };

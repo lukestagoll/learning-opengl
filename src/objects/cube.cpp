@@ -3,8 +3,8 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 
-Cube::Cube(glm::vec3 size, Shader *shader, Texture *texture)
-    : size_(size), shader_(shader), texture_(texture)
+Cube::Cube(glm::vec3 size, Shader *shader, Texture *diff, Texture *spec)
+    : size_(size), shader_(shader), diff_(diff), spec_(spec)
 {
     float halfWidth = size.x / 2;
     float halfHeight = size.y / 2;
@@ -118,7 +118,8 @@ Cube::Cube(glm::vec3 size, Shader *shader, Texture *texture)
     glEnableVertexAttribArray(2);
 
     shader_->use();
-    shader_->setInt("tex0", 0);
+    shader_->setInt("material.diffuse", 0);
+    shader_->setInt("material.specular", 1);
 }
 
 Cube::~Cube()

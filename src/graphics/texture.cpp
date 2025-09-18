@@ -7,7 +7,7 @@
 
 Texture::Texture(const char *name, int texUnit)
 {
-    texUnit = textureUnit_;
+    textureUnit_ = texUnit;
     glGenTextures(1, &id_);
     glActiveTexture(textureUnit_);
     glBindTexture(GL_TEXTURE_2D, id_);

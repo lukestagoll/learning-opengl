@@ -17,7 +17,8 @@ GLchar infoLog[512];
 
 Shader *lightingShader = nullptr;
 Shader *lightsourceShader = nullptr;
-Texture *cubeTexture = nullptr;
+Texture *cubeDiffTexture = nullptr;
+Texture *cubeSpecTexture = nullptr;
 Texture *lightsourceTexture = nullptr;
 Cube *cube = nullptr;
 Cube *lightsource = nullptr;
@@ -54,14 +55,15 @@ void renderer::init()
     lightingShader = new Shader("assets/shaders/lighting.vert", "assets/shaders/lighting.frag");
     lightsourceShader = new Shader("assets/shaders/lightsource.vert", "assets/shaders/lightsource.frag");
 
-    cubeTexture = new Texture("crate_1", GL_TEXTURE0);
+    cubeDiffTexture = new Texture("crate_1", GL_TEXTURE0);
+    cubeSpecTexture = new Texture("crate_1_spec", GL_TEXTURE1);
     lightsourceTexture = new Texture("lamp_1_emission", GL_TEXTURE0);
 
     glm::vec3 lightsourceObjSize(1.0f, 1.0f, 1.0f);
-    lightsource = new Cube(lightsourceObjSize, lightsourceShader, lightsourceTexture);
+    lightsource = new Cube(lightsourceObjSize, lightsourceShader, lightsourceTexture, lightsourceTexture);
 
     glm::vec3 recSize(1.0f, 1.0f, 1.0f);
-    cube = new Cube(recSize, lightingShader, cubeTexture);
+    cube = new Cube(recSize, lightingShader, cubeDiffTexture, cubeSpecTexture);
 
     glEnable(GL_DEPTH_TEST);
 }
@@ -72,12 +74,21 @@ void renderer::render(Camera *camera)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     lightingShader->use();
-    cubeTexture->use();
 
     glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
     glm::vec3 lightColor(1.0f, 1.0f, 1.0f);
-    lightingShader->setVec3("lightPos", lightPos);
-    lightingShader->setVec3("lightColor", lightColor);
+
+    glm::vec3 lightSpecular(1.0f, 1.0f, 1.0f);
+    glm::vec3 lightDiffuse = lightColor * glm::vec3(0.5f);
+    glm::vec3 lightAmbient = lightColor * glm::vec3(0.3f);
+    lightingShader->setVec3("light.position", lightPos);
+    lightingShader->setVec3("light.ambient", lightAmbient);
+    lightingShader->setVec3("light.diffuse", lightDiffuse);
+    lightingShader->setVec3("light.specular", lightSpecular);
+
+    glm::vec3 specular(0.5f, 0.5f, 0.5f);
+    float shininess = 32.0f;
+    lightingShader->setFloat("material.shininess", shininess);
 
     // view/projection transformations
     glm::mat4 projection = camera->getProjection((float)SCREEN_WIDTH / (float)SCREEN_HEIGHT, 0.1f, 100.0f);
@@ -92,6 +103,8 @@ void renderer::render(Camera *camera)
     lightingShader->setMat4("model", model);
 
     // render the cube
+    cubeDiffTexture->use();
+    cubeSpecTexture->use();
     cube->bind();
     cube->draw();
 
@@ -119,7 +132,7 @@ void renderer::render(Camera *camera)
 void renderer::cleanup()
 {
     delete lightingShader;
-    delete cubeTexture;
+    delete cubeDiffTexture;
     delete lightsourceTexture;
     delete cube;
 }
